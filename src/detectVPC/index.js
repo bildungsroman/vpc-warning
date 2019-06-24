@@ -19,7 +19,7 @@ exports.handler = async () => {
   return response;
 };
 
-async function findResources (resource) {
+async function findResources () {
   const cs = new aws.ConfigService();
 
   const params = {
