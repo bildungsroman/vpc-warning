@@ -25,6 +25,9 @@ Resources:
             Schedule: rate(1 day)
           Metadata:
             StackeryName: DailyChecker
+      Environment:
+        Variables:
+          VPC_EMAIL: !Ref EnvConfigvpcEmailAsString
 Parameters:
   StackTagName:
     Type: String
@@ -32,3 +35,9 @@ Parameters:
   EnvironmentTagName:
     Type: String
     Description: Environment Name (injected by Stackery at deployment time)
+  EnvConfigvpcEmailAsString:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /<EnvironmentName>/vpcEmail
+Metadata:
+  EnvConfigParameters:
+    EnvConfigvpcEmailAsString: vpcEmail
