@@ -48,7 +48,7 @@ async function sendWarningEmail(resources) {
     body = await generateEmailBody(resources);
     header = `VPC Warning`;
     // send the email
-    console.log(`Sending email.`);
+    console.log(`Sending email to ${process.env.VPC_EMAIL}.`);
     await sendEmail(header, body);
     console.log(`Email sent`);
   } catch (error) {
@@ -100,7 +100,7 @@ async function sendEmail (subject, body) {
   let params = {
     Destination: {
       ToAddresses: [
-        'anna.spysz@stackery.io'
+        process.env.VPC_EMAIL
       ]
     },
     Message: {
@@ -115,7 +115,7 @@ async function sendEmail (subject, body) {
         Data: subject
       }
     },
-    Source: 'anna.spysz@stackery.io'
+    Source: process.env.VPC_EMAIL
   };
 
   const ses = new AWS.SES();
