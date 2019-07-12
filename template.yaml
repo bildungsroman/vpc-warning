@@ -19,7 +19,7 @@ Resources:
         - AWSConfigRole
         - AmazonVPCFullAccess
         - SESCrudPolicy:
-            IdentityName: !Ref EnvConfigvpcEmailAsString
+            IdentityName: anna.spysz+vpc@stackery.io
             Effect: Allow
             Action:
               - ses:SendEmail
