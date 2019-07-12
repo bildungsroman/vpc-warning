@@ -18,6 +18,8 @@ Resources:
         - AWSXrayWriteOnlyAccess
         - AWSConfigRole
         - AmazonVPCFullAccess
+        - SESCrudPolicy:
+            IdentityName: !Ref EnvConfigvpcEmailAsString
       Events:
         Timer:
           Type: Schedule
