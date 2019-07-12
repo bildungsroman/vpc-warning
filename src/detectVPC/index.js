@@ -118,6 +118,6 @@ async function sendEmail (subject, body) {
     Source: process.env.VPC_EMAIL
   };
 
-  const ses = new AWS.SES();
+  const ses = new aws.SES();
   await ses.sendEmail(params).promise();
 }
