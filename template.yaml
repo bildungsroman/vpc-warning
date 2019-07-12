@@ -20,6 +20,9 @@ Resources:
         - AmazonVPCFullAccess
         - SESCrudPolicy:
             IdentityName: !Ref EnvConfigvpcEmailAsString
+            Effect: Allow
+            Action:
+              - ses:SendEmail
       Events:
         Timer:
           Type: Schedule
