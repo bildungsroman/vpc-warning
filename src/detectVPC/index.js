@@ -29,8 +29,13 @@ async function findResources (region) {
 
   let findVpcs = await ec2region.describeVpcs().promise();
   if (findVpcs.Vpcs.length > 0) {
-    console.log(findVpcs);
-    allVpcs.push({findVpcs});
+    console.log(findVpcs.Vpcs);
+    for (vpc of findVpcs.Vpcs) {
+      allVpcs.push({
+        vpcId: vpc.VpcId,
+        region: region
+        });
+    }
   } else {
     console.log(`No VPCs found in ${region}`);
   }
@@ -42,16 +47,16 @@ async function handleEmail() {
     let count = allVpcs.length === 1 ? 'VPC' : 'VPCs'; // good grammar is important
     console.log(`Oh noes! ${allVpcs.length} ${count} discovered! Sending warning email.`);
     // send email
-    await sendWarningEmail(resources);
+    await sendWarningEmail();
   } else {
     console.log(`No VPCs found here, your money is safe for now!`);
   }
 };
 
-async function sendWarningEmail(resources) {
+async function sendWarningEmail() {
   try {
     // generate email
-    body = await generateEmailBody(resources);
+    body = await generateEmailBody();
     header = `VPC Warning`;
     // send the email
     console.log(`Sending email to ${process.env.VPC_EMAIL}.`);
@@ -72,7 +77,7 @@ function generateEmailBody () {
 
   let instances = '';
   allVpcs.forEach(vpc => {
-    const item = `<li>${vpc.vpcId}</li> in region ${vpc.region}`;
+    const item = `<li>${vpc.vpcId} in region ${vpc.region}</li>`;
     instances = instances + item;
   });
 
