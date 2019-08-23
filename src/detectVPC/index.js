@@ -1,14 +1,17 @@
 const aws = require('aws-sdk');
+const ec2 = new aws.EC2();
 
-// TODO: Make it work for all regions!
+let allVpcs = [];
 
 exports.handler = async () => {
-  try {
-    console.log(`Beginning VPC detection`);
-    await findResources();
-  } catch (error) {
-    console.log(error);
+  // Get valid VPC regions
+  const ec2Regions = await ec2.describeRegions().promise();
+
+  for (let region of ec2Regions.Regions) {
+    await findResources(region.RegionName);
   }
+
+  await handleEmail();
 
   // return a 200 response if no errors
   const response = {
@@ -19,29 +22,32 @@ exports.handler = async () => {
   return response;
 };
 
-async function findResources () {
-  const cs = new aws.ConfigService();
 
-  const params = {
-    ConfigurationAggregatorName: 'vpc-eradicator', /* required */
-    ResourceType: 'AWS::EC2::VPC'
-  };
+async function findResources (region) {
+  // we need to find VPCs in one region at a time
+  const ec2region = new aws.EC2({region: region});
 
-  // Use AWS Config to find all VPCs
-  const resources = await cs.listAggregateDiscoveredResources(params).promise();
-  console.log(resources);
+  let findVpcs = await ec2region.describeVpcs().promise();
+  if (findVpcs.Vpcs.length > 0) {
+    console.log(findVpcs);
+    allVpcs.push({findVpcs});
+  } else {
+    console.log(`No VPCs found in ${region}`);
+  }
 
-  if (resources.ResourceIdentifiers.length > 0) { // run eradicateResources function only if the resource was found
-    let count = resources.ResourceIdentifiers.length === 1 ? 'VPC' : 'VPCs'; // good grammar is important
-    console.log(`Oh noes! ${resources.ResourceIdentifiers.length} ${count} discovered! Sending warning email.`);
-    // Run eradicateResources function on each instance of that resource
+};
+
+async function handleEmail() {
+  if (allVpcs.length > 0) { // only send email if VPCs found
+    let count = allVpcs.length === 1 ? 'VPC' : 'VPCs'; // good grammar is important
+    console.log(`Oh noes! ${allVpcs.length} ${count} discovered! Sending warning email.`);
+    // send email
     await sendWarningEmail(resources);
   } else {
     console.log(`No VPCs found here, your money is safe for now!`);
   }
-}
+};
 
-// send email
 async function sendWarningEmail(resources) {
   try {
     // generate email
@@ -55,18 +61,18 @@ async function sendWarningEmail(resources) {
     console.log(`Error sending email`);
     console.log(error);
   }
-}
+};
 
 // make a pretty email body
-function generateEmailBody (resources) {
+function generateEmailBody () {
   const header = `<h1>⚠️ VPC Warning ⚠️</h1>`;
   const summary = `
-    <div>#️⃣ Number of VPCs found: ${resources.ResourceIdentifiers.length}</div>
+    <div>#️⃣ Number of VPCs found: ${allVpcs.length}</div>
   `;
 
   let instances = '';
-  resources.ResourceIdentifiers.forEach(resource => {
-    const item = `<li>${resource.ResourceId}</li>`;
+  allVpcs.forEach(vpc => {
+    const item = `<li>${vpc.vpcId}</li> in region ${vpc.region}`;
     instances = instances + item;
   });
 
@@ -120,4 +126,4 @@ async function sendEmail (subject, body) {
 
   const ses = new aws.SES();
   await ses.sendEmail(params).promise();
-}
+};
