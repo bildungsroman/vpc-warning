@@ -4,7 +4,11 @@ Receive an email when there's a VPC draining funds in your AWS account! Made ser
 
 ## Setup
 
-1. Fork and clone this repo (Stackery pro users can just enter the following command: `stackery create -n vpc-warning -p github --github-org <your github username> --blueprint-git-url https://github.com/bildungsroman/vpc-warning/`)
+1. Fork and clone this repo. Stackery pro users can just enter the following command: 
+
+```bash
+stackery create -n vpc-warning -p github --github-org <your github username> --blueprint-git-url https://github.com/bildungsroman/vpc-warning/
+```
 
 2. You'll need to add your email address to your env params, either in the [Stackery Dashboard](https://app.stackery.io/environments) or with the following command:
 
