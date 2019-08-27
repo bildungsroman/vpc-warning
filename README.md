@@ -2,6 +2,8 @@
 
 Receive an email when there's a VPC draining funds in your AWS account! Made serverlessly with [Stackery](https://www.stackery.io/).
 
+![Email](https://www.stackery.io/blog/assets/images/posts/vpc-eradicator/email-body.png)
+
 ## Setup
 
 1. Fork and clone this repo. Stackery pro users can just enter the following command: 
@@ -18,7 +20,7 @@ stackery env parameters set -e <your-env-name> vpcEmail <your-email>
 
 3. In the AWS Console, navigate to SES/Email Addresses and add and verify the same email address you entered above
 
-4. Deploy to AWS using Stackery CLI by running the following command from the root of your `vpc-warning` repo:
+4. Deploy to AWS using the Stackery CLI by running the following command from the root of your `vpc-warning` repo:
 
 ```bash
 stackery deploy --interactive-setup
